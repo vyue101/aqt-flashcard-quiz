@@ -194,21 +194,47 @@ shuffleBtn.addEventListener('click', shuffleCards);
 
 // ── Speech ──
 let voices = [];
+// Preferred voices ranked by quality (best first)
+const PREFERRED_VOICES = [
+    'Samantha', 'Karen', 'Daniel', 'Moira', 'Tessa', 'Fiona',     // iOS/macOS high-quality
+    'Google US English', 'Google UK English Female', 'Google UK English Male', // Chrome
+    'Microsoft Zira', 'Microsoft David', 'Microsoft Mark',          // Windows
+    'Alex', 'Victoria', 'Allison', 'Ava', 'Susan', 'Tom',         // macOS
+];
+
 function loadVoices() {
     voices = speechSynthesis.getVoices();
     voiceSelect.innerHTML = '';
-    const preferred = voices.filter(v => v.lang.startsWith('en'));
-    const list = preferred.length ? preferred : voices;
-    list.forEach((v, i) => {
+    const english = voices.filter(v => v.lang.startsWith('en'));
+    const list = english.length ? english : voices;
+
+    // Sort: preferred voices first, then alphabetical
+    const sorted = [...list].sort((a, b) => {
+        const aIdx = PREFERRED_VOICES.findIndex(p => a.name.includes(p));
+        const bIdx = PREFERRED_VOICES.findIndex(p => b.name.includes(p));
+        if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+        if (aIdx !== -1) return -1;
+        if (bIdx !== -1) return 1;
+        return a.name.localeCompare(b.name);
+    });
+
+    let defaultSet = false;
+    sorted.forEach((v) => {
         const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = v.name.substring(0, 30) + (v.lang ? ` (${v.lang})` : '');
+        opt.value = voices.indexOf(v);  // store index into full voices array
+        opt.textContent = v.name + ' (' + v.lang + ')';
+        if (!defaultSet) {
+            opt.selected = true;
+            defaultSet = true;
+        }
         voiceSelect.appendChild(opt);
     });
 }
 speechSynthesis.onvoiceschanged = loadVoices;
 loadVoices();
 
+speedRange.value = 0.9;
+speedValue.textContent = '0.9x';
 speedRange.addEventListener('input', () => {
     speedValue.textContent = parseFloat(speedRange.value).toFixed(1) + 'x';
 });
@@ -216,11 +242,10 @@ speedRange.addEventListener('input', () => {
 function speak(text) {
     speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(text);
-    const preferred = voices.filter(v => v.lang.startsWith('en'));
-    const list = preferred.length ? preferred : voices;
     const idx = parseInt(voiceSelect.value) || 0;
-    if (list[idx]) utter.voice = list[idx];
+    if (voices[idx]) utter.voice = voices[idx];
     utter.rate = parseFloat(speedRange.value);
+    utter.pitch = 1.0;
     speechSynthesis.speak(utter);
 }
 
