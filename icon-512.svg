@@ -1,0 +1,6 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'>
+  <rect width='512' height='512' rx='92.16' fill='#1a1a2e'/>
+  <rect x='128' y='122.88' width='256' height='179.2' rx='20.48' fill='#16213e' stroke='#e94560' stroke-width='10.24'/>
+  <text x='256' y='235.52' text-anchor='middle' dominant-baseline='central' font-family='-apple-system,sans-serif' font-weight='bold' font-size='112.64' fill='#e94560'>?</text>
+  <text x='256' y='399.36' text-anchor='middle' dominant-baseline='central' font-family='-apple-system,sans-serif' font-weight='bold' font-size='71.68' fill='#eee'>AQT</text>
+</svg>
